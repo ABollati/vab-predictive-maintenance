@@ -1,5 +1,8 @@
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
+
+# Prototype script: data cleaning and visualization
 
 data = {
     'id': range(1, 11),
@@ -7,61 +10,32 @@ data = {
     'etat': [2, 2, 1, 0, 2, np.nan, 1, 1, 2, 0]
 }
 
-df_sale = pd.DataFrame(data)
-#print("--- Données brutes du terrain ---")
-#print(df_sale)
+df_raw = pd.DataFrame(data)
 
-#--------------------------------
+# --- Cleaning ---
 
-# Nettoyage des données
+# Replace missing km values with the median
+df_raw['km'] = df_raw['km'].fillna(df_raw['km'].median())
 
-# Remplacement des km manquants par la médiane des km
-df_sale['km'] = df_sale['km'].fillna(df_sale['km'].median())
+# Remove rows with km above 1 000 000 (outliers)
+df_raw = df_raw[df_raw['km'] <= 1_000_000]
 
-# On supprime les lignes avec des km supérieurs à 1000000
-df_sale = df_sale[df_sale['km'] <= 1000000]
+# Remove rows with negative km
+df_raw = df_raw[df_raw['km'] >= 0]
 
-# On supprime les lignes avec des km négatifs
-df_sale = df_sale[df_sale['km'] >= 0]
+# Replace missing etat values with 2 (Good by default)
+df_raw['etat'] = df_raw['etat'].fillna(2)
 
-# On remplace les états manquants par 2 (bon par défaut)
-df_sale['etat'] = df_sale['etat'].fillna(2)
+# --- Visualization ---
 
-#print("\n---Données nettoyées---")
-#print(df_sale)
-
-#--------------------------------
-
-# Visualisation du nombre de VAB par km
-
-import matplotlib.pyplot as plt
-
-# # Création du graphique
-# plt.figure(figsize=(10, 6))
-# plt.hist(df_sale['km'], bins=5, color='skyblue', edgecolor='black')
-
-# # Habillage (très important pour le commandement)
-# plt.title("Répartition du kilométrage de la flotte VAB")
-# plt.xlabel("Kilomètres")
-# plt.ylabel("Nombre de véhicules")
-# plt.grid(axis='y', linestyle='--', alpha=0.7)
-
-# # Affichage
-# plt.show()
-
-#--------------------------------
-
-# Visualisation multidimensionnelle du nombre de VAB par km et par état
-
-# Nouveau graphique : Nuage de points
+# Scatter plot: km vs engine condition
 plt.figure(figsize=(10, 6))
-plt.scatter(df_sale['km'], df_sale['etat'], color='red', s=100, marker='x')
+plt.scatter(df_raw['km'], df_raw['etat'], color='red', s=100, marker='x')
 
-# Habillage
-plt.title("Corrélation KM vs État du moteur")
-plt.xlabel("Kilomètres")
-plt.ylabel("État (0=Critique, 2=Bon)")
-plt.yticks([0, 1, 2]) # Pour n'afficher que les notes entières
+plt.title("Correlation: Mileage vs Engine Condition")
+plt.xlabel("Mileage (km)")
+plt.ylabel("Condition (0=Critical, 2=Good)")
+plt.yticks([0, 1, 2])
 plt.grid(True, linestyle=':', alpha=0.6)
 
 plt.show()

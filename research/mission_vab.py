@@ -1,80 +1,47 @@
 import pandas as pd
 import numpy as np
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.linear_model import LogisticRegression
 
-# Création de données fictives : 5 véhicules
+# Prototype script: 5-vehicle fleet exploration
 data = {
     'id_vehicule': [101, 102, 103, 104, 105],
     'km_compteur': [15000, 45000, 12000, 60000, 32000],
-    'derniere_revision_jours': [30, 180, 10, 400, 90],
-    'etat_moteur': ['Bon', 'Moyen', 'Bon', 'Critique', 'Moyen'],
-    'en_mission': [1, 0, 1, 0, 1] # 1 = Oui, 0 = Non
+    'last_revision_days': [30, 180, 10, 400, 90],
+    'engine_condition': ['Good', 'Fair', 'Good', 'Critical', 'Fair'],
+    'on_mission': [1, 0, 1, 0, 1]  # 1 = Yes, 0 = No
 }
 
 df = pd.DataFrame(data)
-#print("--- État initial de la flotte ---")
-#print(df)
 
-# Isoler les véhicules dont l'état est 'Critique'
-vehicules_en_danger = df[df['etat_moteur'] == 'Critique']
+# Isolate vehicles in critical condition
+critical_vehicles = df[df['engine_condition'] == 'Critical']
 
-#print("\n--- ALERTE : MATÉRIEL EN ÉTAT CRITIQUE ---")
-#print(vehicules_en_danger)
+# Encode condition labels to numeric values
+condition_map = {'Critical': 0, 'Fair': 1, 'Good': 2}
+df['etat_num'] = df['engine_condition'].map(condition_map)
 
-# Dictionnaire de traduction (Mapping)
-traduction = {'Critique': 0, 'Moyen': 1, 'Bon': 2}
-
-# Application de la transformation
-df['etat_num'] = df['etat_moteur'].map(traduction)
-
-#print("\n--- Données numérisées pour l'IA ---")
-#print(df[['id_vehicule', 'etat_moteur', 'etat_num']])
-
-#print("\n--- État initial de la flotte numérisée pour l'IA ---")
-#print(df[['id_vehicule', 'km_compteur', 'derniere_revision_jours', 'etat_num','en_mission']])
-
-#--------------------------------
-#Adimensionnement des données
-from sklearn.preprocessing import MinMaxScaler
-import pandas as pd
-
-# 1. Initialisation du "Scaler"
+# Feature scaling (MinMax normalization)
 scaler = MinMaxScaler()
-
-# 2. Apprentissage et Transformation
-# On transforme les colonnes pour qu'elles soient entre 0 et 1
 df[['km_compteur', 'etat_num']] = scaler.fit_transform(df[['km_compteur', 'etat_num']])
 
-#print("--- Données Normalisées (Prêtes pour l'IA) ---")
-#print(df)
-
-#--------------------------------
-#Régression logistique
-
-from sklearn.linear_model import LogisticRegression
-
-# Données d'entraînement (X = caractéristiques, y = résultat)
-# On imagine des données historiques : km, etat_num
+# Logistic regression on synthetic training labels
 X = df[['km_compteur', 'etat_num']]
-# Cible : Est-ce qu'il est tombé en panne ? (données fictives pour l'exemple)
-y = [0, 0, 0, 1, 0] 
+y = [0, 0, 0, 1, 0]  # Fictional breakdown labels for prototyping
 
-# Création et entraînement du modèle
-modele = LogisticRegression()
-modele.fit(X, y)
+model = LogisticRegression()
+model.fit(X, y)
 
-# Test : Si un nouveau véhicule arrive avec 55 000 km et un état 0 (Critique)
-nouveau_vab = pd.DataFrame([[400000, 0]], columns=['km_compteur', 'etat_num'])
-nouveau_vab_norm = pd.DataFrame(scaler.transform(nouveau_vab), columns=nouveau_vab.columns)
-prediction = modele.predict(nouveau_vab_norm)
-probabilite = modele.predict_proba(nouveau_vab_norm)
+# Test: predict for a high-mileage critical vehicle
+new_vab = pd.DataFrame([[400000, 0]], columns=['km_compteur', 'etat_num'])
+new_vab_scaled = pd.DataFrame(scaler.transform(new_vab), columns=new_vab.columns)
+prediction = model.predict(new_vab_scaled)
+probability = model.predict_proba(new_vab_scaled)
 
-#print(f"\nPrédiction de panne pour le nouveau véhicule : {'PANNE' if prediction[0] == 1 else 'RAS'}")
-print(f"\nProbabilité de panne pour le nouveau véhicule :{probabilite[0][1]}")
+print(f"\nBreakdown probability for test vehicle: {probability[0][1]:.2%}")
 
-# Extraction des coefficients
-coefs = modele.coef_[0]
-intercept = modele.intercept_[0]
-
-print(f"Biais (Intercept) : {intercept:.2f}")
-print(f"Coefficient km_compteur : {coefs[0]:.2f}")
-print(f"Coefficient etat_num : {coefs[1]:.2f}")
+coefs = model.coef_[0]
+intercept = model.intercept_[0]
+print(f"Intercept: {intercept:.2f}")
+print(f"Coefficient km_compteur: {coefs[0]:.2f}")
+print(f"Coefficient etat_num: {coefs[1]:.2f}")

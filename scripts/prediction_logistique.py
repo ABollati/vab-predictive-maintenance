@@ -1,34 +1,34 @@
 import joblib
 import pandas as pd
-import numpy as np
 
-# 1. Chargement des "cerveaux" sauvegardés
-modele = joblib.load('models/modele_final.pkl')
+FEATURES = ['km', 'etat', 'age_vehicule', 'nb_revisions', 'temperature_moteur']
+
+model = joblib.load('models/modele_final.pkl')
 scaler = joblib.load('models/scaler_final.pkl')
 
-def predire_panne(km_brut, etat_brut):
-    # On met les données dans le bon format pour le scaler
-    donnees = pd.DataFrame([[km_brut, etat_brut]],columns=['km', 'etat'])
-    
-    # ÉTAPE CRUCIALE : On normalise avec l'étalon du passé
-    donnees_scalees = pd.DataFrame(scaler.transform(donnees),columns=donnees.columns)
-    
-    # On demande l'avis au modèle
-    prediction = modele.predict(donnees_scalees)
-    probabilite = modele.predict_proba(donnees_scalees)
-    
-    return prediction[0], probabilite[0][1]
+
+def predict_breakdown(km, etat, age_vehicule, nb_revisions, temperature_moteur):
+    data = pd.DataFrame([[km, etat, age_vehicule, nb_revisions, temperature_moteur]],
+                        columns=FEATURES)
+    # Scale with the same scaler used during training
+    data_scaled = pd.DataFrame(scaler.transform(data), columns=FEATURES)
+    prediction = model.predict(data_scaled)
+    probability = model.predict_proba(data_scaled)
+    return prediction[0], probability[0][1]
+
 
 if __name__ == "__main__":
-    print("--- SYSTÈME DE PRÉDICTION DE PANNE VAB PAR REGRESSION LOGISTIQUE ---")
-    
-    # Simulation d'une saisie terrain
-    km = float(input("Entrez le kilométrage actuel : "))
-    etat = int(input("Entrez l'état (0:Mauvais, 1:Moyen, 2:Bon) : "))
-    
-    verdict, score = predire_panne(km, etat)
-    
+    print("--- VAB BREAKDOWN PREDICTION — LOGISTIC REGRESSION ---")
+
+    km = float(input("Enter current mileage (km): "))
+    etat = int(input("Enter engine condition (0=Critical, 1=Fair, 2=Good): "))
+    age_vehicule = int(input("Enter vehicle age (years): "))
+    nb_revisions = int(input("Enter number of past revisions: "))
+    temperature_moteur = int(input("Enter engine temperature (°C): "))
+
+    verdict, score = predict_breakdown(km, etat, age_vehicule, nb_revisions, temperature_moteur)
+
     if verdict == 1:
-        print(f"ALERTE : Risque de panne élevé ({score:.2%}) ! Maintenance requise.")
+        print(f"ALERT: High breakdown risk ({score:.2%}). Maintenance required.")
     else:
-        print(f"RAS : Véhicule opérationnel. Confiance : {(1-score):.2%}")
+        print(f"OK: Vehicle operational. Confidence: {(1 - score):.2%}")

@@ -4,122 +4,105 @@ import joblib
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.linear_model import LogisticRegression
 
+FEATURES = ['km', 'etat', 'age_vehicule', 'nb_revisions', 'temperature_moteur']
+TARGET = 'panne'
 
-#1: NETTOYAGE DES DONNEES
 
-#Suppression des doublons
+# 1. DATA CLEANING
 
-def supprimer_doublons(df):
+def remove_duplicates(df):
     return df.drop_duplicates(subset=['id'], keep='first')
 
-#Conversion des types en nombre
 
-def conversion_en_nombre(df):
-    df.loc[:,'km'] = pd.to_numeric(df['km'], errors='coerce')
-    df.loc[:,'etat'] = pd.to_numeric(df['etat'], errors='coerce')
+def convert_to_numeric(df):
+    for col in FEATURES:
+        df.loc[:, col] = pd.to_numeric(df[col], errors='coerce')
     return df
 
-#Traitement des valeurs manquantes (NaN)
 
-def traitement_des_valeurs_NaN(df):
-    #On enlève les valeurs NaN de "panne"
-    df = df.dropna(subset=['panne'])
-    # Sécurité : Si km est tout vide, on met 0 ou on prévient
+def handle_missing_values(df):
+    df = df.dropna(subset=[TARGET])
     if df['km'].isnull().all():
-        print("ATTENTION : Colonne km vide, remplacement par 0")
+        print("WARNING: km column entirely empty, filling with 0")
         df['km'] = df['km'].fillna(0)
     else:
-        median_km = df['km'].median()
-        df.loc[:,'km'] = df['km'].fillna(median_km)
-    
-    # État : 2 par défaut
+        df.loc[:, 'km'] = df['km'].fillna(df['km'].median())
     df['etat'] = df['etat'].fillna(2)
+    df['age_vehicule'] = df['age_vehicule'].fillna(df['age_vehicule'].median())
+    df['nb_revisions'] = df['nb_revisions'].fillna(df['nb_revisions'].median())
+    df['temperature_moteur'] = df['temperature_moteur'].fillna(df['temperature_moteur'].median())
     return df
 
-#Filtrage des aberrations
 
-def filtrage_des_valeurs_aberrantes(df):
-    return df[(df['km'] <= 1000000) & (df['km'] >= 0)]
+def filter_outliers(df):
+    return df[(df['km'] >= 0) & (df['km'] <= 1_000_000)]
 
-#Fonction complète
 
-def nettoyer_donnees(df):
-    df_sans_doublons = supprimer_doublons(df)
-    df_numerique = conversion_en_nombre(df_sans_doublons)
-    df_NaN_to_median = traitement_des_valeurs_NaN(df_numerique)
-    df_nettoye = filtrage_des_valeurs_aberrantes(df_NaN_to_median)
-    return df_nettoye
+def clean_data(df):
+    df = remove_duplicates(df)
+    df = convert_to_numeric(df)
+    df = handle_missing_values(df)
+    df = filter_outliers(df)
+    return df
 
-#--------------------------------
 
-#2: NORMALISATION DES DONNEES
+# 2. FEATURE SCALING
 
-def normaliser_les_donnees(df):
+def scale_features(df):
     scaler = MinMaxScaler()
-    df[['km','etat']] = scaler.fit_transform(df[['km','etat']])
+    df[FEATURES] = scaler.fit_transform(df[FEATURES])
     return df, scaler
 
 
-#--------------------------------
+# 3. MODEL TRAINING
 
-#3: ENTRAINEMENT DU MODELE
+def train_logistic_regression(df):
+    df, scaler = scale_features(df)
+    X = df[FEATURES]
+    y = df[TARGET]
+    model = LogisticRegression(max_iter=1000)
+    model.fit(X, y)
+    return model, scaler
 
-def regression_logistique(df):
-    df, scaler = normaliser_les_donnees(df)
-    X = df[['km', 'etat']]
-    y = df['panne']
-    modele = LogisticRegression()
-    modele.fit(X,y)
-    return modele, scaler
 
-#BLOC D'ORCHESTRATION DU SCRIPT
+# MAIN ORCHESTRATION
 
 if __name__ == "__main__":
-    
-    print("--- DÉMARRAGE DU PIPELINE LOGISTIQUE ---")
-    
-    # 1. Chargement (On simule ou on charge un CSV)
-    def charger_donnees():
+
+    print("--- LOGISTIC REGRESSION PIPELINE STARTED ---")
+
+    def load_data():
         try:
-            df_raw = pd.read_csv("data/donnees_brutes_vab.csv") 
-            print("Chargement depuis le CSV réussi.")
+            df_raw = pd.read_csv("data/donnees_brutes_vab.csv")
+            print("CSV loaded successfully.")
         except FileNotFoundError:
-            print("CSV introuvable. Génération du jeu de données de secours...")
-            data_exception = {
-            'id': [101, 102, 103, 104, 105],
-            'km': [15000, 45000, 12000, 60000, 32000],
-            'etat': [2, 1, 2, 0, 1],
-            'panne': [0, 0, 0, 1, 0] # 1 = Oui, 0 = Non
+            print("CSV not found. Generating fallback dataset...")
+            data_fallback = {
+                'id': range(101, 111),
+                'km':               [15000, 45000, 12000, 80000, 32000, 65000, 22000, 95000, 40000, 28000],
+                'etat':             [2,     1,     2,     0,     1,     0,     2,     0,     1,     2],
+                'age_vehicule':     [2,     8,     3,     15,    6,     18,    4,     22,    7,     5],
+                'nb_revisions':     [2,     7,     3,     12,    5,     14,    4,     18,    6,     4],
+                'temperature_moteur':[75,   88,    72,   108,   85,   112,   73,   115,   90,    76],
+                'panne':            [0,     0,     0,     1,     0,     1,     0,     1,     0,     0],
             }
-            df_raw = pd.DataFrame(data_exception)
+            df_raw = pd.DataFrame(data_fallback)
         return df_raw
 
-    df_raw = charger_donnees()
-    
-        #On crée une copie pour garder la donnée originale
+    df_raw = load_data()
     df = df_raw.copy()
-    
-    # 2. Nettoyage
-    df_clean = nettoyer_donnees(df)
-    #print(df_clean)
-    
-    # 3. Entraînement et Scaling
-    mon_modele, mon_scaler = regression_logistique(df_clean)
-    
-   # Extraction des coefficients
-    coefs = mon_modele.coef_[0]
-    intercept = mon_modele.intercept_[0]
 
-    print(f"Biais (Intercept) : {intercept:.2f}")
-    print(f"Coefficient km : {coefs[0]:.2f}")
-    print(f"Coefficient état : {coefs[1]:.2f}")
-        
-    # 4. Sauvegarde
-    joblib.dump(mon_modele, "models/modele_final.pkl")
-    joblib.dump(mon_scaler, "models/scaler_final.pkl")
-    
-    print("--- MISSION TERMINÉE : MODÈLE PARÉ À L'EMPLOI ---")
+    df_clean = clean_data(df)
 
+    model, scaler = train_logistic_regression(df_clean)
 
+    coefs = model.coef_[0]
+    intercept = model.intercept_[0]
+    print(f"Intercept: {intercept:.2f}")
+    for name, coef in zip(FEATURES, coefs):
+        print(f"  Coefficient {name}: {coef:.2f}")
 
+    joblib.dump(model, "models/modele_final.pkl")
+    joblib.dump(scaler, "models/scaler_final.pkl")
 
+    print("--- PIPELINE COMPLETE: MODEL SAVED ---")

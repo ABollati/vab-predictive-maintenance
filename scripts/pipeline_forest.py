@@ -3,117 +3,100 @@ import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 import joblib
 
+FEATURES = ['km', 'etat', 'age_vehicule', 'nb_revisions', 'temperature_moteur']
+TARGET = 'panne'
 
-#1: NETTOYAGE DES DONNEES
 
-#Suppression des doublons
+# 1. DATA CLEANING
 
-def supprimer_doublons(df):
+def remove_duplicates(df):
     return df.drop_duplicates(subset=['id'], keep='first')
 
-#Conversion des types en nombre
 
-def conversion_en_nombre(df):
-    df.loc[:,'km'] = pd.to_numeric(df['km'], errors='coerce')
-    df.loc[:,'etat'] = pd.to_numeric(df['etat'], errors='coerce')
+def convert_to_numeric(df):
+    for col in FEATURES:
+        df.loc[:, col] = pd.to_numeric(df[col], errors='coerce')
     return df
 
-#Traitement des valeurs manquantes (NaN)
 
-def traitement_des_valeurs_NaN(df):
-    # Sécurité : Si km est tout vide, on met 0 ou on prévient
+def handle_missing_values(df):
+    df = df.dropna(subset=[TARGET])
     if df['km'].isnull().all():
-        print("ATTENTION : Colonne km vide, remplacement par 0")
+        print("WARNING: km column entirely empty, filling with 0")
         df['km'] = df['km'].fillna(0)
     else:
-        median_km = df['km'].median()
-        df.loc[:,'km'] = df['km'].fillna(median_km)
-    
-    # État : 2 par défaut
+        df.loc[:, 'km'] = df['km'].fillna(df['km'].median())
     df['etat'] = df['etat'].fillna(2)
+    df['age_vehicule'] = df['age_vehicule'].fillna(df['age_vehicule'].median())
+    df['nb_revisions'] = df['nb_revisions'].fillna(df['nb_revisions'].median())
+    df['temperature_moteur'] = df['temperature_moteur'].fillna(df['temperature_moteur'].median())
     return df
 
-#Filtrage des aberrations
 
-def filtrage_des_valeurs_aberrantes(df):
-    return df[(df['km'] <= 1000000) & (df['km'] >= 0)]
-
-#Fonction complète
-
-def nettoyer_donnees(df):
-    df_sans_doublons = supprimer_doublons(df)
-    df_numerique = conversion_en_nombre(df_sans_doublons)
-    df_NaN_to_median = traitement_des_valeurs_NaN(df_numerique)
-    df_nettoye = filtrage_des_valeurs_aberrantes(df_NaN_to_median)
-    return df_nettoye
+def filter_outliers(df):
+    return df[(df['km'] >= 0) & (df['km'] <= 1_000_000)]
 
 
-#--------------------------------
+def clean_data(df):
+    df = remove_duplicates(df)
+    df = convert_to_numeric(df)
+    df = handle_missing_values(df)
+    df = filter_outliers(df)
+    return df
 
-#2: ENTRAINEMENT DU MODELE
 
-def entrainer_foret(df):
-    # X = Caractéristiques, y = Cible
-    X = df[['km', 'etat']]
-    y = df['panne']
-    
-    # Initialisation de la forêt
-    # n_estimators=100 : 100 arbres vont voter
-    # max_depth=3 : On limite la croissance pour éviter l'overfitting (vu votre peu de données)
-    modele_rf = RandomForestClassifier(n_estimators=100, max_depth=3, random_state=42)
-    #print("Valeurs manquantes dans y :", y.isna().sum())
-    modele_rf.fit(X, y)
-    return modele_rf
+# 2. MODEL TRAINING
 
-# Extraction de l'importance des paramètres
-def afficher_importance(modele):
-    importances = modele.feature_importances_
-    print(f"Importance km: {importances[0]:.2%}")
-    print(f"Importance état: {importances[1]:.2%}")
+def train_random_forest(df):
+    X = df[FEATURES]
+    y = df[TARGET]
+    # n_estimators=100: 100 trees vote; max_depth=5 limits overfitting
+    model_rf = RandomForestClassifier(n_estimators=100, max_depth=5, random_state=42)
+    model_rf.fit(X, y)
+    return model_rf
 
-#BLOC D'ORCHESTRATION DU SCRIPT
+
+def display_feature_importance(model):
+    importances = model.feature_importances_
+    print("Feature importances:")
+    for name, imp in sorted(zip(FEATURES, importances), key=lambda x: -x[1]):
+        print(f"  {name}: {imp:.2%}")
+
+
+# MAIN ORCHESTRATION
 
 if __name__ == "__main__":
-    
-    print("--- DÉMARRAGE DU PIPELINE FORÊTS ALEATOIRES ---")
-    
-    # 1. Chargement (On simule ou on charge un CSV)
-    def charger_donnees():
+
+    print("--- RANDOM FOREST PIPELINE STARTED ---")
+
+    def load_data():
         try:
             df_raw = pd.read_csv('data/donnees_brutes_vab.csv')
-            print("Chargement depuis le CSV réussi.")
+            print("CSV loaded successfully.")
         except FileNotFoundError:
-            print("CSV introuvable. Génération du jeu de données de secours...")
-            data_exception = {
-                'id': [101, 102, 103, 104, 105],
-                'km': [15000, 45000, 12000, 60000, 32000],
-                'etat': [2, 1, 2, 0, 1],
-                'panne': [0, 0, 0, 1, 0]
+            print("CSV not found. Generating fallback dataset...")
+            data_fallback = {
+                'id': range(101, 111),
+                'km':               [15000, 45000, 12000, 80000, 32000, 65000, 22000, 95000, 40000, 28000],
+                'etat':             [2,     1,     2,     0,     1,     0,     2,     0,     1,     2],
+                'age_vehicule':     [2,     8,     3,     15,    6,     18,    4,     22,    7,     5],
+                'nb_revisions':     [2,     7,     3,     12,    5,     14,    4,     18,    6,     4],
+                'temperature_moteur':[75,   88,    72,   108,   85,   112,   73,   115,   90,    76],
+                'panne':            [0,     0,     0,     1,     0,     1,     0,     1,     0,     0],
             }
-            df_raw = pd.DataFrame(data_exception)
+            df_raw = pd.DataFrame(data_fallback)
         return df_raw
 
-    df_raw = charger_donnees()
-    
-    #Copie des données pour garder la dataframe originale
+    df_raw = load_data()
     df = df_raw.copy()
-    
-    # 2. Nettoyage
-    df_clean = nettoyer_donnees(df)
-    #print(df_clean)
-    
-    # 3. Entraînement
-    modele_rf = entrainer_foret(df_clean)
-    
-    # 4. Importance des parametres
-    afficher_importance(modele_rf)
-    
-    # On sauvegarde le modèle entraîné
-    joblib.dump(modele_rf, 'models/modele_forest.pkl')
-    print("Modèle Forêt Aléatoire sauvegardé avec succès.")
-    
-    print("--- MISSION TERMINÉE : MODÈLE PARÉ À L'EMPLOI ---")
 
+    df_clean = clean_data(df)
 
+    model_rf = train_random_forest(df_clean)
 
+    display_feature_importance(model_rf)
 
+    joblib.dump(model_rf, 'models/modele_forest.pkl')
+    print("Random Forest model saved.")
+
+    print("--- PIPELINE COMPLETE: MODEL SAVED ---")
