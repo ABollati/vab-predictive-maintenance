@@ -102,16 +102,16 @@ The script will prompt for mileage, engine condition, vehicle age, number of rev
 
 ## Model Comparison
 
-Results on a 20% hold-out test set (stratified split, `random_state=42`):
+Results from 5-fold cross-validation (mean ± std):
 
 | Model | Accuracy | Precision | Recall | F1-Score |
 |---|---|---|---|---|
-| Logistic Regression | 0.863 | 0.539 | 0.304 | 0.389 |
-| Random Forest | 0.869 | 0.583 | 0.304 | 0.400 |
+| Logistic Regression | 0.865 ± 0.010 | 0.596 ± 0.138 | 0.217 ± 0.095 | 0.305 ± 0.102 |
+| Random Forest | 0.855 ± 0.014 | 0.489 ± 0.113 | 0.217 ± 0.055 | 0.300 ± 0.074 |
 
 > **Note:** The dataset has a ~14% positive class rate (realistic class imbalance).  
 > Accuracy alone is therefore misleading — Precision, Recall, and F1-Score are the relevant metrics here.  
-> Both models show room for improvement, particularly on Recall (detecting actual breakdowns).
+> The two models perform similarly; both show room for improvement, particularly on Recall (detecting actual breakdowns).
 
 **Feature importances (Random Forest):**
 
