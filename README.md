@@ -4,7 +4,7 @@
 ![scikit-learn](https://img.shields.io/badge/scikit--learn-1.3-orange?logo=scikit-learn)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
-Predictive maintenance project for *Véhicules de l'Avant Blindé* (VAB) armoured vehicles.  
+Predictive maintenance project for *Véhicules de l'Avant Blindé* (VAB) armored vehicles.  
 The goal is to classify whether a vehicle is at risk of breakdown based on operational and mechanical features, using supervised machine learning (Logistic Regression and Random Forest).
 
 Data is synthetic and generated for technical demonstration purposes.
