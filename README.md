@@ -52,8 +52,8 @@ maintenance-predictive-vab/
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/ABollati/maintenance-predictive-vab.git
-   cd maintenance-predictive-vab
+   git clone https://github.com/ABollati/vab-predictive-maintenance.git
+   cd vab-predictive-maintenance
    ```
 
 2. **Create a virtual environment** (recommended):
