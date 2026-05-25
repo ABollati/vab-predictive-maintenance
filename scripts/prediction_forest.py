@@ -1,7 +1,7 @@
 import pandas as pd
 import joblib
 
-FEATURES = ['km', 'etat', 'age_vehicule', 'nb_revisions', 'temperature_moteur']
+FEATURES = ['km', 'condition', 'vehicle_age', 'num_revisions', 'engine_temperature']
 
 model_rf = joblib.load('models/model_forest.pkl')
 
@@ -10,12 +10,12 @@ if __name__ == "__main__":
     print("--- VAB BREAKDOWN PREDICTION — RANDOM FOREST ---")
 
     km = float(input("Enter current mileage (km): "))
-    etat = int(input("Enter engine condition (0=Critical, 1=Fair, 2=Good): "))
-    age_vehicule = int(input("Enter vehicle age (years): "))
-    nb_revisions = int(input("Enter number of past revisions: "))
-    temperature_moteur = int(input("Enter engine temperature (°C): "))
+    condition = int(input("Enter engine condition (0=Critical, 1=Fair, 2=Good): "))
+    vehicle_age = int(input("Enter vehicle age (years): "))
+    num_revisions = int(input("Enter number of past revisions: "))
+    engine_temperature = int(input("Enter engine temperature (°C): "))
 
-    new_vab = pd.DataFrame([[km, etat, age_vehicule, nb_revisions, temperature_moteur]],
+    new_vab = pd.DataFrame([[km, condition, vehicle_age, num_revisions, engine_temperature]],
                            columns=FEATURES)
 
     proba_rf = model_rf.predict_proba(new_vab)[0][1]

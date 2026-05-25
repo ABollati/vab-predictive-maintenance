@@ -14,10 +14,10 @@ Data is synthetic and generated for technical demonstration purposes.
 | Variable | Description |
 |---|---|
 | `km` | Current odometer reading |
-| `etat` | Engine condition: `0` = Critical, `1` = Fair, `2` = Good |
-| `age_vehicule` | Vehicle age in years |
-| `nb_revisions` | Number of past maintenance revisions |
-| `temperature_moteur` | Engine temperature in °C |
+| `condition` | Engine condition: `0` = Critical, `1` = Fair, `2` = Good |
+| `vehicle_age` | Vehicle age in years |
+| `num_revisions` | Number of past maintenance revisions |
+| `engine_temperature` | Engine temperature in °C |
 | `breakdown` | **Target** — `1` = Breakdown detected, `0` = OK |
 
 ## Project Structure
@@ -118,11 +118,11 @@ Feature weights from training on the full dataset (via `pipeline_*.py`):
 
 | Feature | LR Coefficient | RF Importance |
 |---|---|---|
-| `etat` | -1.99 | 17.6% |
-| `temperature_moteur` | +1.40 | 28.8% |
-| `age_vehicule` | +1.20 | 15.3% |
+| `condition` | -1.99 | 17.6% |
+| `engine_temperature` | +1.40 | 28.8% |
+| `vehicle_age` | +1.20 | 15.3% |
 | `km` | +0.96 | 25.7% |
-| `nb_revisions` | +0.56 | 12.6% |
+| `num_revisions` | +0.56 | 12.6% |
 
 > LR coefficients are signed (negative = reduces breakdown risk) and scaled (MinMax). RF importances measure how much each feature contributes to mean impurity decrease in the random forest.
 

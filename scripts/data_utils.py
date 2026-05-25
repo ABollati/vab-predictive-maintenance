@@ -1,17 +1,17 @@
 import pandas as pd
 import numpy as np
 
-FEATURES = ['km', 'etat', 'age_vehicule', 'nb_revisions', 'temperature_moteur']
+FEATURES = ['km', 'condition', 'vehicle_age', 'num_revisions', 'engine_temperature']
 TARGET = 'breakdown'
 
 _FALLBACK_DATA = {
     'id': range(101, 111),
-    'km':                [15000, 45000, 12000, 80000, 32000, 65000, 22000, 95000, 40000, 28000],
-    'etat':              [2,     1,     2,     0,     1,     0,     2,     0,     1,     2],
-    'age_vehicule':      [2,     8,     3,     15,    6,     18,    4,     22,    7,     5],
-    'nb_revisions':      [2,     7,     3,     12,    5,     14,    4,     18,    6,     4],
-    'temperature_moteur':[75,    88,    72,    108,   85,    112,   73,    115,   90,    76],
-    'breakdown':         [0,     0,     0,     1,     0,     1,     0,     1,     0,     0],
+    'km':               [15000, 45000, 12000, 80000, 32000, 65000, 22000, 95000, 40000, 28000],
+    'condition':        [2,     1,     2,     0,     1,     0,     2,     0,     1,     2],
+    'vehicle_age':      [2,     8,     3,     15,    6,     18,    4,     22,    7,     5],
+    'num_revisions':    [2,     7,     3,     12,    5,     14,    4,     18,    6,     4],
+    'engine_temperature':[75,   88,    72,    108,   85,    112,   73,    115,   90,    76],
+    'breakdown':        [0,     0,     0,     1,     0,     1,     0,     1,     0,     0],
 }
 
 
@@ -42,10 +42,10 @@ def _handle_missing_values(df):
         df['km'] = df['km'].fillna(0)
     else:
         df.loc[:, 'km'] = df['km'].fillna(df['km'].median())
-    df['etat'] = df['etat'].fillna(2)
-    df['age_vehicule'] = df['age_vehicule'].fillna(df['age_vehicule'].median())
-    df['nb_revisions'] = df['nb_revisions'].fillna(df['nb_revisions'].median())
-    df['temperature_moteur'] = df['temperature_moteur'].fillna(df['temperature_moteur'].median())
+    df['condition'] = df['condition'].fillna(2)
+    df['vehicle_age'] = df['vehicle_age'].fillna(df['vehicle_age'].median())
+    df['num_revisions'] = df['num_revisions'].fillna(df['num_revisions'].median())
+    df['engine_temperature'] = df['engine_temperature'].fillna(df['engine_temperature'].median())
     return df
 
 

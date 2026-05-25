@@ -1,16 +1,15 @@
 import joblib
 import pandas as pd
 
-FEATURES = ['km', 'etat', 'age_vehicule', 'nb_revisions', 'temperature_moteur']
+FEATURES = ['km', 'condition', 'vehicle_age', 'num_revisions', 'engine_temperature']
 
 model = joblib.load('models/model_logistic.pkl')
 scaler = joblib.load('models/scaler_logistic.pkl')
 
 
-def predict_breakdown(km, etat, age_vehicule, nb_revisions, temperature_moteur):
-    data = pd.DataFrame([[km, etat, age_vehicule, nb_revisions, temperature_moteur]],
+def predict_breakdown(km, condition, vehicle_age, num_revisions, engine_temperature):
+    data = pd.DataFrame([[km, condition, vehicle_age, num_revisions, engine_temperature]],
                         columns=FEATURES)
-    # Scale with the same scaler used during training
     data_scaled = pd.DataFrame(scaler.transform(data), columns=FEATURES)
     prediction = model.predict(data_scaled)
     probability = model.predict_proba(data_scaled)
@@ -21,12 +20,12 @@ if __name__ == "__main__":
     print("--- VAB BREAKDOWN PREDICTION — LOGISTIC REGRESSION ---")
 
     km = float(input("Enter current mileage (km): "))
-    etat = int(input("Enter engine condition (0=Critical, 1=Fair, 2=Good): "))
-    age_vehicule = int(input("Enter vehicle age (years): "))
-    nb_revisions = int(input("Enter number of past revisions: "))
-    temperature_moteur = int(input("Enter engine temperature (°C): "))
+    condition = int(input("Enter engine condition (0=Critical, 1=Fair, 2=Good): "))
+    vehicle_age = int(input("Enter vehicle age (years): "))
+    num_revisions = int(input("Enter number of past revisions: "))
+    engine_temperature = int(input("Enter engine temperature (°C): "))
 
-    verdict, score = predict_breakdown(km, etat, age_vehicule, nb_revisions, temperature_moteur)
+    verdict, score = predict_breakdown(km, condition, vehicle_age, num_revisions, engine_temperature)
 
     if verdict == 1:
         print(f"ALERT: High breakdown risk ({score:.2%}). Maintenance required.")
