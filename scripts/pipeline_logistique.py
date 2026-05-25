@@ -56,6 +56,13 @@ def scale_features(df):
 
 # 3. MODEL TRAINING
 
+def display_coefficients(model):
+    print("Logistic Regression coefficients:")
+    coefs = model.coef_[0]
+    for name, coef in sorted(zip(FEATURES, coefs), key=lambda x: -abs(x[1])):
+        print(f"  {name}: {coef:.2f}")
+
+
 def train_logistic_regression(df):
     df, scaler = scale_features(df)
     X = df[FEATURES]
@@ -96,11 +103,7 @@ if __name__ == "__main__":
 
     model, scaler = train_logistic_regression(df_clean)
 
-    coefs = model.coef_[0]
-    intercept = model.intercept_[0]
-    print(f"Intercept: {intercept:.2f}")
-    for name, coef in zip(FEATURES, coefs):
-        print(f"  Coefficient {name}: {coef:.2f}")
+    display_coefficients(model)
 
     joblib.dump(model, "models/modele_final.pkl")
     joblib.dump(scaler, "models/scaler_final.pkl")

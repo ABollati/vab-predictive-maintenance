@@ -113,13 +113,15 @@ Results from 5-fold cross-validation (mean ± std):
 > Accuracy alone is therefore misleading — Precision, Recall, and F1-Score are the relevant metrics here.  
 > The two models perform similarly; both show room for improvement, particularly on Recall (detecting actual breakdowns).
 
-**Feature importances (Random Forest):**
+Feature weights from training on the full dataset (via `pipeline_*.py`):
 
-| Feature | Importance |
-|---|---|
-| `temperature_moteur` | 28.8% |
-| `km` | 25.7% |
-| `etat` | 17.6% |
-| `age_vehicule` | 15.3% |
-| `nb_revisions` | 12.6% |
+| Feature | LR Coefficient | RF Importance |
+|---|---|---|
+| `etat` | -1.99 | 17.6% |
+| `temperature_moteur` | +1.40 | 28.8% |
+| `age_vehicule` | +1.20 | 15.3% |
+| `km` | +0.96 | 25.7% |
+| `nb_revisions` | +0.56 | 12.6% |
+
+> LR coefficients are signed (negative = reduces breakdown risk) and scaled (MinMax). RF importances measure mean impurity decrease across trees.
 
