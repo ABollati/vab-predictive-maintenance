@@ -76,16 +76,16 @@ Open the EDA notebook to understand the dataset before modelling:
 jupyter notebook notebooks/01_eda_vab.ipynb
 ```
 
-### 2. Model Comparison
+### 2. Model Evaluation
 
-Train both models and generate evaluation figures (saved to `figures/`):
+Evaluate both models via 5-fold cross-validation. Prints metric table (mean ± std) and saves confusion matrices and ROC curves to `figures/`:
 ```bash
 python scripts/model_comparison.py
 ```
 
-### 3. Train Models Individually
+### 3. Train Final Models
 
-Train each model on the full dataset (no train/test split) to produce the final saved models:
+Train each model on the full dataset and save to `models/`. Prints feature weights (LR coefficients and RF importances):
 ```bash
 python scripts/pipeline_logistique.py
 python scripts/pipeline_forest.py
