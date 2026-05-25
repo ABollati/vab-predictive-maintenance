@@ -35,9 +35,6 @@ maintenance-predictive-vab/
 │   └── modele_forest.pkl            # Trained Random Forest model
 ├── notebooks/
 │   └── 01_eda_vab.ipynb             # Exploratory Data Analysis
-├── research/
-│   ├── mission_vab.py               # Prototyping: fleet exploration & LogReg
-│   └── mission_nettoyage.py         # Prototyping: data cleaning & visualisation
 ├── scripts/
 │   ├── pipeline_logistique.py       # Training pipeline — Logistic Regression
 │   ├── pipeline_forest.py           # Training pipeline — Random Forest
@@ -87,7 +84,7 @@ python scripts/model_comparison.py
 
 ### 3. Train Models Individually
 
-Re-train with updated data:
+Train each model on the full dataset (no train/test split) to produce the final saved models:
 ```bash
 python scripts/pipeline_logistique.py
 python scripts/pipeline_forest.py
@@ -126,8 +123,3 @@ Results on a 20% hold-out test set (stratified split, `random_state=42`):
 | `age_vehicule` | 15.3% |
 | `nb_revisions` | 12.6% |
 
-## Research Scripts
-
-The `research/` folder contains standalone prototyping scripts used to validate individual building blocks before integration into the final pipelines:
-- `mission_vab.py` — fleet exploration, encoding, normalisation, logistic regression prototype
-- `mission_nettoyage.py` — data cleaning rules and visualisation prototype
