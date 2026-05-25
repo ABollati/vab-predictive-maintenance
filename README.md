@@ -36,11 +36,12 @@ maintenance-predictive-vab/
 ├── notebooks/
 │   └── 01_eda_vab.ipynb             # Exploratory Data Analysis
 ├── scripts/
+│   ├── data_utils.py                # Shared data loading and cleaning
 │   ├── pipeline_logistique.py       # Training pipeline — Logistic Regression
 │   ├── pipeline_forest.py           # Training pipeline — Random Forest
 │   ├── prediction_logistique.py     # Live prediction — Logistic Regression
 │   ├── prediction_forest.py         # Live prediction — Random Forest
-│   └── model_comparison.py          # Side-by-side model evaluation
+│   └── model_comparison.py          # Side-by-side model evaluation (5-fold CV)
 ├── README.md
 └── requirements.txt
 ```
