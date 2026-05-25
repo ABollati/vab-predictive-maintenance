@@ -41,7 +41,7 @@ if __name__ == "__main__":
 
     display_feature_importance(model_rf)
 
-    joblib.dump(model_rf, 'models/modele_forest.pkl')
+    joblib.dump(model_rf, 'models/model_forest.pkl')
     print("Random Forest model saved.")
 
     print("--- PIPELINE COMPLETE: MODEL SAVED ---")

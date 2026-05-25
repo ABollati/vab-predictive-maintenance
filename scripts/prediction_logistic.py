@@ -3,8 +3,8 @@ import pandas as pd
 
 FEATURES = ['km', 'etat', 'age_vehicule', 'nb_revisions', 'temperature_moteur']
 
-model = joblib.load('models/modele_final.pkl')
-scaler = joblib.load('models/scaler_final.pkl')
+model = joblib.load('models/model_logistic.pkl')
+scaler = joblib.load('models/scaler_logistic.pkl')
 
 
 def predict_breakdown(km, etat, age_vehicule, nb_revisions, temperature_moteur):

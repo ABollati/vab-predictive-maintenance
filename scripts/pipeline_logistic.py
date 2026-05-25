@@ -50,7 +50,7 @@ if __name__ == "__main__":
 
     display_coefficients(model)
 
-    joblib.dump(model, "models/modele_final.pkl")
-    joblib.dump(scaler, "models/scaler_final.pkl")
+    joblib.dump(model, "models/model_logistic.pkl")
+    joblib.dump(scaler, "models/scaler_logistic.pkl")
 
     print("--- PIPELINE COMPLETE: MODEL SAVED ---")

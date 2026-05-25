@@ -109,9 +109,9 @@ def save_models(models, X, y):
     lr_pipeline = dict(models)['Logistic Regression']
     rf = dict(models)['Random Forest']
 
-    joblib.dump(lr_pipeline.named_steps['clf'], 'models/modele_final.pkl')
-    joblib.dump(lr_pipeline.named_steps['scaler'], 'models/scaler_final.pkl')
-    joblib.dump(rf, 'models/modele_forest.pkl')
+    joblib.dump(lr_pipeline.named_steps['clf'], 'models/model_logistic.pkl')
+    joblib.dump(lr_pipeline.named_steps['scaler'], 'models/scaler_logistic.pkl')
+    joblib.dump(rf, 'models/model_forest.pkl')
     print("Models saved to models/")
 
 

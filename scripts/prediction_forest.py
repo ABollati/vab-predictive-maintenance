@@ -3,7 +3,7 @@ import joblib
 
 FEATURES = ['km', 'etat', 'age_vehicule', 'nb_revisions', 'temperature_moteur']
 
-model_rf = joblib.load('models/modele_forest.pkl')
+model_rf = joblib.load('models/model_forest.pkl')
 
 
 if __name__ == "__main__":

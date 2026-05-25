@@ -18,28 +18,28 @@ Data is synthetic and generated for technical demonstration purposes.
 | `age_vehicule` | Vehicle age in years |
 | `nb_revisions` | Number of past maintenance revisions |
 | `temperature_moteur` | Engine temperature in °C |
-| `panne` | **Target** — `1` = Breakdown detected, `0` = OK |
+| `breakdown` | **Target** — `1` = Breakdown detected, `0` = OK |
 
 ## Project Structure
 
 ```
 maintenance-predictive-vab/
 ├── data/
-│   └── donnees_brutes_vab.csv      # Synthetic dataset (800 rows)
+│   └── raw_data_vab.csv      # Synthetic dataset (800 rows)
 ├── figures/
 │   ├── confusion_matrices.png       # Side-by-side confusion matrices
 │   └── roc_curves.png               # Side-by-side ROC curves
 ├── models/
-│   ├── modele_final.pkl             # Trained Logistic Regression model
-│   ├── scaler_final.pkl             # MinMaxScaler (for Logistic Regression)
-│   └── modele_forest.pkl            # Trained Random Forest model
+│   ├── model_logistic.pkl             # Trained Logistic Regression model
+│   ├── scaler_logistic.pkl             # MinMaxScaler (for Logistic Regression)
+│   └── model_forest.pkl            # Trained Random Forest model
 ├── notebooks/
 │   └── 01_eda_vab.ipynb             # Exploratory Data Analysis
 ├── scripts/
 │   ├── data_utils.py                # Shared data loading and cleaning
-│   ├── pipeline_logistique.py       # Training pipeline — Logistic Regression
+│   ├── pipeline_logistic.py       # Training pipeline — Logistic Regression
 │   ├── pipeline_forest.py           # Training pipeline — Random Forest
-│   ├── prediction_logistique.py     # Live prediction — Logistic Regression
+│   ├── prediction_logistic.py     # Live prediction — Logistic Regression
 │   ├── prediction_forest.py         # Live prediction — Random Forest
 │   └── model_comparison.py          # Side-by-side model evaluation (5-fold CV)
 ├── README.md
@@ -87,7 +87,7 @@ python scripts/model_comparison.py
 
 Train each model on the full dataset and save to `models/`. Prints feature weights (LR coefficients and RF importances):
 ```bash
-python scripts/pipeline_logistique.py
+python scripts/pipeline_logistic.py
 python scripts/pipeline_forest.py
 ```
 
@@ -95,7 +95,7 @@ python scripts/pipeline_forest.py
 
 Run an interactive breakdown prediction for a specific vehicle:
 ```bash
-python scripts/prediction_logistique.py
+python scripts/prediction_logistic.py
 # or
 python scripts/prediction_forest.py
 ```

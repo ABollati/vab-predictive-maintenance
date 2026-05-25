@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 
 FEATURES = ['km', 'etat', 'age_vehicule', 'nb_revisions', 'temperature_moteur']
-TARGET = 'panne'
+TARGET = 'breakdown'
 
 _FALLBACK_DATA = {
     'id': range(101, 111),
@@ -11,11 +11,11 @@ _FALLBACK_DATA = {
     'age_vehicule':      [2,     8,     3,     15,    6,     18,    4,     22,    7,     5],
     'nb_revisions':      [2,     7,     3,     12,    5,     14,    4,     18,    6,     4],
     'temperature_moteur':[75,    88,    72,    108,   85,    112,   73,    115,   90,    76],
-    'panne':             [0,     0,     0,     1,     0,     1,     0,     1,     0,     0],
+    'breakdown':         [0,     0,     0,     1,     0,     1,     0,     1,     0,     0],
 }
 
 
-def load_data(path='data/donnees_brutes_vab.csv'):
+def load_data(path='data/raw_data_vab.csv'):
     try:
         df = pd.read_csv(path)
         print(f"Dataset loaded: {df.shape[0]} rows.")

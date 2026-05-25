@@ -1,4 +1,4 @@
-id,km,etat,age_vehicule,nb_revisions,temperature_moteur,panne
+id,km,etat,age_vehicule,nb_revisions,temperature_moteur,breakdown
 101,63432,2,7,6,76,0
 102,149852,2,20,22,64,0
 103,217200,1,29,22,87,0
