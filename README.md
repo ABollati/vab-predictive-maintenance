@@ -124,5 +124,5 @@ Feature weights from training on the full dataset (via `pipeline_*.py`):
 | `km` | +0.96 | 25.7% |
 | `nb_revisions` | +0.56 | 12.6% |
 
-> LR coefficients are signed (negative = reduces breakdown risk) and scaled (MinMax). RF importances measure mean impurity decrease across trees.
+> LR coefficients are signed (negative = reduces breakdown risk) and scaled (MinMax). RF importances measure how much each feature contributes to mean impurity decrease in the random forest.
 
