@@ -79,7 +79,7 @@ jupyter notebook notebooks/01_eda_vab.ipynb
 
 ### 2. Model Evaluation
 
-Evaluate both models via 5-fold cross-validation. Prints metric table (mean ± std) and saves confusion matrices and ROC curves to `figures/`:
+Evaluate both models via 5-fold cross-validation. Prints metric table (mean ± std) and saves confusion matrices, ROC curves, and Precision-Recall curves to `figures/`:
 ```bash
 python scripts/model_comparison.py
 ```
