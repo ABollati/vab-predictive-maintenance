@@ -113,7 +113,7 @@ Results from 5-fold cross-validation (mean ± std):
 
 > **Note:** The dataset has a ~14% positive class rate (realistic class imbalance).  
 > Accuracy alone is therefore misleading — Precision, Recall, and F1-Score are the relevant metrics here.  
-> The two models perform similarly; both show room for improvement, particularly on Recall (detecting actual breakdowns).
+> The two models perform similarly; both show room for improvement, particularly on Recall (detecting actual breakdowns). Setting `class_weight='balanced'` on the Logistic Regression would penalise missed breakdowns more heavily and is expected to improve Recall at the cost of Precision.
 
 ### Precision-Recall Curves
 
@@ -132,4 +132,9 @@ Feature weights from training on the full dataset (via `pipeline_*.py`):
 | `num_revisions` | +0.56 | 12.6% |
 
 > LR coefficients are signed (negative = reduces breakdown risk) and scaled (MinMax). RF importances measure how much each feature contributes to mean impurity decrease in the random forest.
+
+## Limitations
+
+- **Collinearity:** Several feature pairs are correlated by construction (`engine_temperature`/`condition`, `km`/`vehicle_age`, `km`/`num_revisions`, `vehicle_age`/`num_revisions`). For Logistic Regression, this makes individual coefficients less reliable to interpret. For Random Forest, importance is diluted across correlated features — each importance value is likely underestimated.
+- **Feature reduction:** Dropping either `condition` or `engine_temperature` (the most collinear pair) could reduce redundancy without significant loss of predictive signal.
 
