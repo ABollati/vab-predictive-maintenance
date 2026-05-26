@@ -28,7 +28,8 @@ maintenance-predictive-vab/
 │   └── raw_data_vab.csv      # Synthetic dataset (800 rows)
 ├── figures/
 │   ├── confusion_matrices.png       # Side-by-side confusion matrices
-│   └── roc_curves.png               # Side-by-side ROC curves
+│   ├── roc_curves.png               # Side-by-side ROC curves
+│   └── pr_curves.png                # Side-by-side Precision-Recall curves
 ├── models/
 │   ├── model_logistic.pkl             # Trained Logistic Regression model
 │   ├── scaler_logistic.pkl             # MinMaxScaler (for Logistic Regression)
@@ -113,6 +114,12 @@ Results from 5-fold cross-validation (mean ± std):
 > **Note:** The dataset has a ~14% positive class rate (realistic class imbalance).  
 > Accuracy alone is therefore misleading — Precision, Recall, and F1-Score are the relevant metrics here.  
 > The two models perform similarly; both show room for improvement, particularly on Recall (detecting actual breakdowns).
+
+### Precision-Recall Curves
+
+ROC curves can be misleading on imbalanced datasets: the large number of true negatives inflates the AUC, making models appear stronger than they are. Precision-Recall curves focus exclusively on the minority class (breakdowns), making them more informative in this context.
+
+The baseline (dashed line) represents a random classifier at the positive class rate (~14%). A useful model must stay well above this line. The summary metric is **Average Precision (AP)**, the area under the PR curve.
 
 Feature weights from training on the full dataset (via `pipeline_*.py`):
 
