@@ -2,6 +2,7 @@
 Model comparison: Logistic Regression vs Random Forest.
 Evaluates both models via 5-fold cross-validation (mean ± std),
 and saves confusion matrices, ROC curves, and PR curves to the figures/ directory.
+Final model training and saving is handled by pipeline_logistic.py and pipeline_forest.py.
 """
 
 import os
@@ -10,7 +11,6 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import pandas as pd
 import matplotlib.pyplot as plt
-import joblib
 
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
@@ -132,21 +132,6 @@ def plot_pr_curves(models, X, y, probas):
     plt.close()
 
 
-# --- Save final models (trained on full dataset) ---
-
-def save_models(models, X, y):
-    for name, model in models:
-        model.fit(X, y)
-
-    lr_pipeline = dict(models)['Logistic Regression']
-    rf = dict(models)['Random Forest']
-
-    joblib.dump(lr_pipeline.named_steps['clf'], 'models/model_logistic.pkl')
-    joblib.dump(lr_pipeline.named_steps['scaler'], 'models/scaler_logistic.pkl')
-    joblib.dump(rf, 'models/model_forest.pkl')
-    print("Models saved to models/")
-
-
 # --- Main ---
 
 if __name__ == "__main__":
@@ -172,6 +157,4 @@ if __name__ == "__main__":
     plot_confusion_matrices(models, X, y)
     plot_roc_curves(models, X, y, probas)
     plot_pr_curves(models, X, y, probas)
-
-    save_models(models, X, y)
     print("=" * 60)
